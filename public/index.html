@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>AI Chat — Réalisé par Fayssal Outlahyante</title>
 
     <!-- Fonts -->
@@ -795,6 +795,30 @@
         }
         .msg-group.user .msg-body {
           max-width: 92%;
+        }
+        .input-box textarea {
+          font-size: 16px; /* Prevents auto-zoom on iOS */
+          padding: 12px 50px 45px 12px;
+        }
+        .think-btn {
+          padding: 5px 10px;
+          font-size: 0.75rem;
+          bottom: 8px;
+          left: 8px;
+        }
+        .think-btn svg {
+          width: 12px;
+          height: 12px;
+        }
+        .send-btn {
+          width: 32px;
+          height: 32px;
+          bottom: 8px;
+          right: 8px;
+        }
+        .model-btn {
+          font-size: 0.8rem;
+          padding: 5px 10px;
         }
       }
 
