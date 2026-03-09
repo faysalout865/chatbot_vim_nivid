@@ -119,8 +119,10 @@ app.post("/api/chat", (req, res) => {
   }
 
   res.setHeader("Content-Type",  "text/event-stream");
-  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Cache-Control", "no-cache, no-transform");
   res.setHeader("Connection",    "keep-alive");
+  // CE HEADER EST OBLIGATOIRE POUR VERCEL POUR NE PAS BLOQUER LE STREAMING
+  res.setHeader("X-Accel-Buffering", "no"); 
   res.flushHeaders();
 
   streamNvidia({
