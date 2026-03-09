@@ -262,32 +262,6 @@
       .model-btn svg {
         opacity: 0.6;
       }
-      .think-btn {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 5px 12px;
-        border-radius: var(--rs);
-        border: 1px solid var(--border);
-        background: var(--surface);
-        color: var(--text2);
-        font-size: 0.82rem;
-        font-weight: 500;
-        transition: all var(--t);
-        margin-left: 5px;
-      }
-      .think-btn:hover {
-        background: var(--surface2);
-      }
-      .think-btn.active {
-        color: #fff;
-        background: rgba(16, 163, 127, 0.15);
-        border-color: rgba(16, 163, 127, 0.4);
-      }
-      .think-btn.active svg {
-        stroke: var(--accent);
-      }
-
       .status-pill {
         display: flex;
         align-items: center;
@@ -709,7 +683,7 @@
         font-family: "Inter", system-ui, sans-serif;
         font-size: 0.94rem;
         line-height: 1.6;
-        padding: 14px 54px 14px 18px;
+        padding: 14px 54px 50px 18px; /* Added bottom padding to accommodate buttons */
         resize: none;
         max-height: 200px;
       }
@@ -748,6 +722,37 @@
         background: var(--surface2);
         opacity: 0.55;
         cursor: not-allowed;
+      }
+
+      /* ── Thinking feature toggle button ─────────────────────── */
+      .think-btn {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--text2);
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: all var(--t);
+        cursor: pointer;
+      }
+      .think-btn:hover {
+        background: var(--surface2);
+        color: var(--text);
+      }
+      .think-btn.active {
+        color: #fff;
+        background: rgba(16, 163, 127, 0.15);
+        border-color: rgba(16, 163, 127, 0.4);
+      }
+      .think-btn.active svg {
+        stroke: var(--accent);
       }
 
       .input-footer {
@@ -914,15 +919,6 @@
               <polyline points="6 9 12 15 18 9" />
             </svg>
           </button>
-          
-          <button class="think-btn active" id="thinkingToggle" title="Toggle Deep Thinking">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/>
-              <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>
-            </svg>
-            Thinking
-          </button>
-
           <div class="status-pill">
             <div class="online-dot"></div>
             Online · NVIDIA NIM
@@ -999,6 +995,15 @@
                 placeholder="Message AI Assistant…"
                 aria-label="Message"
               ></textarea>
+              
+              <button class="think-btn active" id="thinkingToggle" title="Activer / Désactiver Thinking">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/>
+                  <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>
+                </svg>
+                Thinking
+              </button>
+
               <button class="send-btn" id="sendBtn" disabled aria-label="Send">
                 <svg
                   width="15"
