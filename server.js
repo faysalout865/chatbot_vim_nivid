@@ -16,11 +16,10 @@ const PORT = process.env.PORT || 3000;
 const CONFIG = {
   apiKey:       process.env.NVIDIA_API_KEY || "YOUR_API_KEY_HERE",
   apiUrl:       "https://integrate.api.nvidia.com/v1/chat/completions",
-  textModel:    "meta/llama-3.2-11b-vision-instruct",  // works for both text & vision
-  visionModel:  "meta/llama-3.2-11b-vision-instruct",  // multimodal – handles images
-  maxTokens:    512,
-  temperature:  1.0,
-  topP:         1.0,
+  textModel:    "qwen/qwen3.5-397b-a17b",
+  maxTokens:    16384,
+  temperature:  0.60,
+  topP:         0.95,
 };
 
 // ── Middleware ──────────────────────────────────────────────
@@ -126,12 +125,16 @@ app.post("/api/chat", (req, res) => {
   res.flushHeaders();
 
   streamNvidia({
-    model:       CONFIG.textModel,
+    model:              CONFIG.textModel,
     messages,
-    max_tokens:  CONFIG.maxTokens,
-    temperature: CONFIG.temperature,
-    top_p:       CONFIG.topP,
-    stream:      true,
+    max_tokens:         CONFIG.maxTokens,
+    temperature:        CONFIG.temperature,
+    top_p:              CONFIG.topP,
+    top_k:              20,
+    presence_penalty:   0,
+    repetition_penalty: 1,
+    stream:             true,
+    chat_template_kwargs: { enable_thinking: true },
   }, res);
 });
 
