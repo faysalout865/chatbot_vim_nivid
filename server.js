@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 3000;
 
 // ── Configuration ───────────────────────────────────────────
 const CONFIG = {
-  apiKey:       "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",
+  apiKey:       process.env.NVIDIA_API_KEY || "YOUR_API_KEY_HERE",
   apiUrl:       "https://integrate.api.nvidia.com/v1/chat/completions",
   textModel:    "meta/llama-3.2-11b-vision-instruct",  // works for both text & vision
   visionModel:  "meta/llama-3.2-11b-vision-instruct",  // multimodal – handles images
@@ -134,7 +134,12 @@ app.post("/api/chat", (req, res) => {
 });
 
 // ── Start ─────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log("\n  🤖  AI Chatbot — Réalisé par Fayssal Outlahyante");
-  console.log("  🚀  http://localhost:" + PORT + "\n");
-});
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log("\n  🤖  AI Chatbot — Réalisé par Fayssal Outlahyante");
+    console.log("  🚀  http://localhost:" + PORT + "\n");
+  });
+}
+
+// Pour Vercel : on exporte l'app sans faire app.listen()
+module.exports = app;
