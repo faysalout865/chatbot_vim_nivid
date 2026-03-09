@@ -111,7 +111,7 @@ function streamNvidia(payload, res) {
 
 // ── POST /api/chat  (text only) ─────────────────────────────
 app.post("/api/chat", (req, res) => {
-  const { messages } = req.body;
+  const { messages, thinking } = req.body;
 
   if (!Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({ error: "messages[] is required" });
@@ -124,15 +124,20 @@ app.post("/api/chat", (req, res) => {
   res.setHeader("X-Accel-Buffering", "no"); 
   res.flushHeaders();
 
-  streamNvidia({
+  const apiPayload = {
     model:              CONFIG.textModel,
     messages,
     max_tokens:         CONFIG.maxTokens,
     temperature:        CONFIG.temperature,
     top_p:              CONFIG.topP,
     stream:             true,
-    chat_template_kwargs: { enable_thinking: true },
-  }, res);
+  };
+
+  if (thinking) {
+    apiPayload.chat_template_kwargs = { enable_thinking: true };
+  }
+
+  streamNvidia(apiPayload, res);
 });
 
 // ── Start ─────────────────────────────────────────────────────

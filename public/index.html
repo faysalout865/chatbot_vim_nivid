@@ -262,6 +262,32 @@
       .model-btn svg {
         opacity: 0.6;
       }
+      .think-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: var(--rs);
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text2);
+        font-size: 0.82rem;
+        font-weight: 500;
+        transition: all var(--t);
+        margin-left: 5px;
+      }
+      .think-btn:hover {
+        background: var(--surface2);
+      }
+      .think-btn.active {
+        color: #fff;
+        background: rgba(16, 163, 127, 0.15);
+        border-color: rgba(16, 163, 127, 0.4);
+      }
+      .think-btn.active svg {
+        stroke: var(--accent);
+      }
+
       .status-pill {
         display: flex;
         align-items: center;
@@ -888,6 +914,15 @@
               <polyline points="6 9 12 15 18 9" />
             </svg>
           </button>
+          
+          <button class="think-btn active" id="thinkingToggle" title="Toggle Deep Thinking">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/>
+              <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>
+            </svg>
+            Thinking
+          </button>
+
           <div class="status-pill">
             <div class="online-dot"></div>
             Online · NVIDIA NIM
@@ -1093,6 +1128,18 @@
         let history   = []; // [{role, content}]
         let sessions  = []; // saved chats for sidebar
         let streaming = false;
+        let isThinkingEnabled = true;
+
+        /* ── Thinking Toggle ─────────────────────────────────────── */
+        const thinkingToggle = document.getElementById("thinkingToggle");
+        thinkingToggle.addEventListener("click", () => {
+          isThinkingEnabled = !isThinkingEnabled;
+          if (isThinkingEnabled) {
+            thinkingToggle.classList.add("active");
+          } else {
+            thinkingToggle.classList.remove("active");
+          }
+        });
 
         /* ── Sidebar helpers ─────────────────────────────────────── */
         const openSidebar = () => {
@@ -1328,7 +1375,7 @@
               fetch("/api/chat", {
                 method:  "POST",
                 headers: { "Content-Type": "application/json" },
-                body:    JSON.stringify({ messages: history }),
+                body:    JSON.stringify({ messages: history, thinking: isThinkingEnabled }),
               }),
               botBody, botGroup
             );
