@@ -1,0 +1,1363 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Chat — Réalisé par Fayssal Outlahyante</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Highlight.js (syntax highlighting) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- Marked.js (Markdown → HTML) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+      /* ── Reset ─────────────────────────────────────────────── */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* ── Design tokens ──────────────────────────────────────── */
+      :root {
+        --bg: #212121;
+        --sidebar: #171717;
+        --surface: #2f2f2f;
+        --surface2: #3d3d3d;
+        --border: #404040;
+        --text: #ececec;
+        --text2: #8e8ea0;
+        --text3: #565665;
+        --accent: #10a37f;
+        --accentH: #0d8a6a;
+        --userbg: #2f2f2f;
+        --codebg: #0d1117;
+        --codebar: #161b22;
+        --r: 12px;
+        --rs: 8px;
+        --mono: "JetBrains Mono", "Fira Code", monospace;
+        --sw: 260px;
+        --t: 0.2s ease;
+      }
+
+      html,
+      body {
+        height: 100%;
+        font-family: "Inter", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        overflow: hidden;
+      }
+      button {
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-family: inherit;
+        color: inherit;
+      }
+
+      /* ── App shell ─────────────────────────────────────────── */
+      #app {
+        display: flex;
+        height: 100vh;
+      }
+
+      /* ════════════════════════════════════════
+       SIDEBAR
+    ════════════════════════════════════════ */
+      .sidebar {
+        width: var(--sw);
+        background: var(--sidebar);
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid var(--border);
+        flex-shrink: 0;
+        transition: transform var(--t);
+      }
+      .sb-head {
+        padding: 14px 10px 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .new-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border-radius: var(--rs);
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-size: 0.86rem;
+        font-weight: 500;
+        transition: background var(--t);
+      }
+      .new-btn:hover {
+        background: var(--surface);
+      }
+
+      .ib {
+        width: 36px;
+        height: 36px;
+        border-radius: var(--rs);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text2);
+        transition:
+          background var(--t),
+          color var(--t);
+      }
+      .ib:hover {
+        background: var(--surface);
+        color: var(--text);
+      }
+
+      .sb-section {
+        padding: 12px 14px 4px;
+        font-size: 0.68rem;
+        font-weight: 600;
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .hist-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 4px 8px;
+      }
+      .hist-list::-webkit-scrollbar {
+        width: 3px;
+      }
+      .hist-list::-webkit-scrollbar-thumb {
+        background: var(--surface2);
+        border-radius: 3px;
+      }
+
+      .hist-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: var(--rs);
+        font-size: 0.83rem;
+        color: var(--text2);
+        cursor: pointer;
+        transition:
+          background var(--t),
+          color var(--t);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .hist-item:hover {
+        background: var(--surface);
+        color: var(--text);
+      }
+      .hist-item svg {
+        flex-shrink: 0;
+        opacity: 0.55;
+      }
+
+      .sb-foot {
+        border-top: 1px solid var(--border);
+        padding: 10px;
+      }
+      .user-pill {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: var(--rs);
+        width: 100%;
+        transition: background var(--t);
+      }
+      .user-pill:hover {
+        background: var(--surface);
+      }
+      .u-av {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #10a37f, #0e7fc1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 700;
+        color: #fff;
+        flex-shrink: 0;
+      }
+      .u-name {
+        font-size: 0.84rem;
+        font-weight: 500;
+      }
+      .u-plan {
+        font-size: 0.68rem;
+        color: var(--text3);
+      }
+
+      .overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 99;
+      }
+      .overlay.show {
+        display: block;
+      }
+
+      /* ════════════════════════════════════════
+       MAIN
+    ════════════════════════════════════════ */
+      .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+
+      /* Header */
+      .chat-hdr {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg);
+        flex-shrink: 0;
+      }
+      .model-btn {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 6px 12px;
+        border-radius: var(--rs);
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+        font-size: 0.88rem;
+        font-weight: 500;
+        transition: background var(--t);
+      }
+      .model-btn:hover {
+        background: var(--surface2);
+      }
+      .model-btn svg {
+        opacity: 0.6;
+      }
+      .status-pill {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: auto;
+        font-size: 0.73rem;
+        color: var(--text2);
+      }
+      .online-dot {
+        width: 7px;
+        height: 7px;
+        background: #10a37f;
+        border-radius: 50%;
+        box-shadow: 0 0 6px rgba(16, 163, 127, 0.65);
+        animation: pulse 2s ease infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.5;
+          transform: scale(1.4);
+        }
+      }
+      .mmb {
+        display: none;
+      } /* mobile menu button */
+
+      /* Messages container */
+      .msgs {
+        flex: 1;
+        overflow-y: auto;
+        scroll-behavior: smooth;
+        padding-bottom: 24px;
+      }
+      .msgs::-webkit-scrollbar {
+        width: 5px;
+      }
+      .msgs::-webkit-scrollbar-thumb {
+        background: var(--surface2);
+        border-radius: 4px;
+      }
+
+      /* Welcome screen */
+      .welcome {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        gap: 18px;
+        text-align: center;
+        padding: 40px 20px;
+        animation: fadeUp 0.5s ease;
+      }
+      .wlc-logo {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #10a37f, #0e7fc1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        box-shadow: 0 8px 30px rgba(16, 163, 127, 0.35);
+      }
+      .welcome h1 {
+        font-size: 1.85rem;
+        font-weight: 600;
+      }
+      .welcome p {
+        font-size: 0.93rem;
+        color: var(--text2);
+        max-width: 380px;
+        line-height: 1.6;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        justify-content: center;
+        margin-top: 6px;
+      }
+      .chip {
+        padding: 9px 18px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        font-size: 0.82rem;
+        color: var(--text2);
+        transition: all var(--t);
+      }
+      .chip:hover {
+        background: var(--surface2);
+        color: var(--text);
+        border-color: var(--accent);
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ── Message groups ─────────────────────────────────────── */
+      .msg-group {
+        padding: 24px max(16px, calc(50% - 390px));
+        animation: fadeUp 0.3s ease;
+      }
+      .msg-meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .msg-av {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .msg-group.user .msg-av {
+        background: linear-gradient(135deg, #9b59b6, #6c63ff);
+        color: #fff;
+      }
+      .msg-group.assistant .msg-av {
+        background: linear-gradient(135deg, #10a37f, #0e7fc1);
+        color: #fff;
+      }
+      .msg-sender {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text2);
+      }
+      .msg-time {
+        font-size: 0.68rem;
+        color: var(--text3);
+        margin-left: auto;
+      }
+
+      .msg-body {
+        padding-left: 38px;
+        font-size: 0.94rem;
+        line-height: 1.78;
+        color: var(--text);
+      }
+      /* User: simple dark pill */
+      .msg-group.user .msg-body {
+        background: var(--userbg);
+        border-radius: var(--r);
+        padding: 13px 18px;
+        width: fit-content;
+        max-width: 85%;
+        margin-left: auto;
+        white-space: pre-wrap;
+      }
+
+      /* ── Markdown rendered output ─────────────────────────── */
+      .rendered p {
+        margin: 0 0 12px;
+      }
+      .rendered p:last-child {
+        margin-bottom: 0;
+      }
+      .rendered ul,
+      .rendered ol {
+        padding-left: 22px;
+        margin: 6px 0 10px;
+      }
+      .rendered li {
+        margin-bottom: 4px;
+      }
+      .rendered strong {
+        font-weight: 600;
+      }
+      .rendered em {
+        font-style: italic;
+      }
+      .rendered a {
+        color: var(--accent);
+        text-decoration: underline;
+      }
+      .rendered h1,
+      .rendered h2,
+      .rendered h3 {
+        font-weight: 600;
+        margin: 20px 0 8px;
+        line-height: 1.3;
+      }
+      .rendered h1 {
+        font-size: 1.35rem;
+      }
+      .rendered h2 {
+        font-size: 1.15rem;
+      }
+      .rendered h3 {
+        font-size: 1rem;
+      }
+      .rendered hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 18px 0;
+      }
+      .rendered blockquote {
+        border-left: 3px solid var(--accent);
+        padding: 8px 16px;
+        margin: 10px 0;
+        background: rgba(16, 163, 127, 0.07);
+        border-radius: 0 var(--rs) var(--rs) 0;
+        color: var(--text2);
+      }
+      .rendered table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 12px 0;
+        font-size: 0.87rem;
+      }
+      .rendered th,
+      .rendered td {
+        border: 1px solid var(--border);
+        padding: 8px 12px;
+        text-align: left;
+      }
+      .rendered th {
+        background: var(--surface);
+        font-weight: 600;
+      }
+
+      /* Inline code */
+      .rendered code:not(pre code) {
+        font-family: var(--mono);
+        font-size: 0.84em;
+        background: var(--surface2);
+        color: #e8912d;
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+
+      /* ── Code blocks with syntax highlighting ─────────────── */
+      .code-wrap {
+        margin: 14px 0;
+        border-radius: var(--r);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        background: var(--codebg);
+      }
+      .code-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 14px;
+        background: var(--codebar);
+        border-bottom: 1px solid var(--border);
+      }
+      .code-lang {
+        font-family: var(--mono);
+        font-size: 0.73rem;
+        color: var(--text2);
+        letter-spacing: 0.04em;
+      }
+      .copy-code-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.73rem;
+        color: var(--text2);
+        padding: 4px 10px;
+        border-radius: 5px;
+        border: 1px solid var(--border);
+        background: var(--surface2);
+        transition: all var(--t);
+        cursor: pointer;
+      }
+      .copy-code-btn:hover {
+        background: var(--surface);
+        color: var(--text);
+        border-color: var(--accent);
+      }
+      .copy-code-btn.done {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .code-wrap pre {
+        margin: 0;
+        padding: 18px;
+        overflow-x: auto;
+        font-family: var(--mono);
+        font-size: 0.845rem;
+        line-height: 1.65;
+      }
+      .code-wrap pre::-webkit-scrollbar {
+        height: 5px;
+      }
+      .code-wrap pre::-webkit-scrollbar-thumb {
+        background: var(--surface2);
+        border-radius: 4px;
+      }
+      /* Force hljs styles, don't let marked reset them */
+      .code-wrap code {
+        font-family: var(--mono) !important;
+        background: none !important;
+        padding: 0 !important;
+        font-size: inherit !important;
+        color: inherit !important;
+        border-radius: 0 !important;
+      }
+
+      /* ── Typing indicator ───────────────────────────────────── */
+      .typing-row {
+        display: none;
+        padding: 24px max(16px, calc(50% - 390px));
+      }
+      .typing-row.show {
+        display: block;
+        animation: fadeUp 0.3s ease;
+      }
+      .typing-dots {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding-left: 38px;
+        margin-top: 10px;
+      }
+      .dot {
+        width: 6px;
+        height: 6px;
+        background: var(--text2);
+        border-radius: 50%;
+        animation: bonce 1.3s ease infinite;
+      }
+      .dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+      @keyframes bonce {
+        0%,
+        80%,
+        100% {
+          transform: translateY(0);
+          opacity: 0.35;
+        }
+        40% {
+          transform: translateY(-7px);
+          opacity: 1;
+        }
+      }
+
+      /* ── Message action bar (copy full message) ─────────────── */
+      .msg-actions {
+        display: flex;
+        gap: 4px;
+        padding-left: 38px;
+        margin-top: 7px;
+        opacity: 0;
+        transition: opacity var(--t);
+      }
+      .msg-group:hover .msg-actions {
+        opacity: 1;
+      }
+      .msg-act-btn {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 9px;
+        border-radius: 5px;
+        font-size: 0.71rem;
+        color: var(--text3);
+        transition: all var(--t);
+      }
+      .msg-act-btn:hover {
+        background: var(--surface);
+        color: var(--text2);
+      }
+
+      /* ── Input area ─────────────────────────────────────────── */
+      .input-area {
+        padding: 10px 16px 20px;
+        background: var(--bg);
+        flex-shrink: 0;
+      }
+      .input-wrap {
+        max-width: 768px;
+        margin: 0 auto;
+      }
+      .input-box {
+        position: relative;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        transition:
+          border-color var(--t),
+          box-shadow var(--t);
+      }
+      .input-box:focus-within {
+        border-color: #555;
+        box-shadow: 0 0 0 3px rgba(16, 163, 127, 0.12);
+      }
+      .input-box textarea {
+        width: 100%;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: var(--text);
+        font-family: "Inter", system-ui, sans-serif;
+        font-size: 0.94rem;
+        line-height: 1.6;
+        padding: 14px 54px 14px 18px;
+        resize: none;
+        max-height: 200px;
+      }
+      .input-box textarea::placeholder {
+        color: var(--text3);
+      }
+      .input-box textarea::-webkit-scrollbar {
+        width: 4px;
+      }
+      .input-box textarea::-webkit-scrollbar-thumb {
+        background: var(--surface2);
+        border-radius: 4px;
+      }
+
+      .send-btn {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
+        border-radius: var(--rs);
+        background: var(--accent);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          background var(--t),
+          transform var(--t);
+      }
+      .send-btn:hover:not(:disabled) {
+        background: var(--accentH);
+        transform: scale(1.07);
+      }
+      .send-btn:disabled {
+        background: var(--surface2);
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      .input-footer {
+        max-width: 768px;
+        max-width: 768px;
+        margin: 8px auto 0;
+        display: flex;
+        justify-content: center;
+        font-size: 0.71rem;
+        color: var(--text3);
+      }
+
+      /* ── Responsive ─────────────────────────────────────────── */
+      @media (max-width: 768px) {
+        .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          height: 100vh;
+          z-index: 100;
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .mmb {
+          display: flex;
+        }
+        .msg-group,
+        .typing-row {
+          padding: 18px 12px;
+        }
+        .input-area {
+          padding: 8px 10px 16px;
+        }
+      }
+      @media (max-width: 480px) {
+        .welcome h1 {
+          font-size: 1.5rem;
+        }
+        .msg-group.user .msg-body {
+          max-width: 92%;
+        }
+      }
+
+      /* ── Global scrollbar ───────────────────────────────────── */
+      ::-webkit-scrollbar {
+        width: 5px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--surface2);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--border);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app">
+      <!-- ══════════════════════════════════════
+       SIDEBAR
+  ══════════════════════════════════════ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sb-head">
+          <button class="new-btn" id="newChatBtn">
+            <!-- plus icon -->
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            New chat
+          </button>
+          <button class="ib" id="closeSbBtn" title="Close sidebar">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="sb-section">Recents</div>
+        <div class="hist-list" id="histList"></div>
+
+        <div class="sb-foot">
+          <button class="user-pill">
+            <div class="u-av">F</div>
+            <div>
+              <div class="u-name">Fayssal Outlahyante</div>
+              <div class="u-plan">AI Assistant</div>
+            </div>
+          </button>
+        </div>
+      </aside>
+      <div class="overlay" id="overlay"></div>
+
+      <!-- ══════════════════════════════════════
+       MAIN
+  ══════════════════════════════════════ -->
+      <div class="main">
+        <!-- Header -->
+        <header class="chat-hdr">
+          <button class="ib mmb" id="menuBtn" title="Open sidebar">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+          <button class="model-btn">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 8v4l3 3" />
+            </svg>
+            Llama 3.2‑11B Vision
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+          <div class="status-pill">
+            <div class="online-dot"></div>
+            Online · NVIDIA NIM
+          </div>
+        </header>
+
+        <!-- Messages -->
+        <div class="msgs" id="msgs">
+          <!-- Welcome state -->
+          <div class="welcome" id="welcome">
+            <div class="wlc-logo">✦</div>
+            <h1>How can I help you today?</h1>
+            <p>
+              Powered by Qwen 3.5‑122B via NVIDIA NIM. Ask me anything — code,
+              analysis, writing, and more.
+            </p>
+            <div class="chips">
+              <button
+                class="chip"
+                data-prompt="Explain how neural network transformers work in deep learning"
+              >
+                Explain transformers
+              </button>
+              <button
+                class="chip"
+                data-prompt="Write a Python function to sort a list of dictionaries by a given key"
+              >
+                Python sort dicts
+              </button>
+              <button
+                class="chip"
+                data-prompt="What is the difference between REST and GraphQL? Give me pros and cons of each"
+              >
+                REST vs GraphQL
+              </button>
+              <button
+                class="chip"
+                data-prompt="Write a bash script to backup a directory with a timestamped filename"
+              >
+                Bash backup script
+              </button>
+            </div>
+          </div>
+
+          <!-- Typing indicator -->
+          <div class="typing-row" id="typingRow">
+            <div class="msg-meta">
+              <div
+                class="msg-av"
+                style="
+                  background: linear-gradient(135deg, #10a37f, #0e7fc1);
+                  color: #fff;
+                "
+              >
+                ✦
+              </div>
+              <span class="msg-sender">AI Assistant</span>
+            </div>
+            <div class="typing-dots">
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input -->
+        <div class="input-area">
+          <div class="input-wrap">
+            <div class="input-box">
+              <textarea
+                id="userInput"
+                rows="1"
+                placeholder="Message AI Assistant…"
+                aria-label="Message"
+              ></textarea>
+              <button class="send-btn" id="sendBtn" disabled aria-label="Send">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="input-footer">
+            AI can make mistakes. &nbsp;
+            <strong style="color: var(--text2)"
+              >Réalisé par Fayssal Outlahyante</strong
+            >
+          </div>
+        </div>
+      </div>
+      <!-- /.main -->
+    </div>
+    <!-- /#app -->
+
+    <!-- ════════════════════════════════════════
+     CLIENT JAVASCRIPT
+════════════════════════════════════════ -->
+    <script>
+      (function () {
+        "use strict";
+
+        /* ── Configure Marked with a custom renderer ─────────────── */
+        marked.setOptions({ breaks: true, gfm: true });
+
+        const renderer = new marked.Renderer();
+
+        /**
+         * Custom code block renderer — adds a language label + copy button
+         * and runs syntax highlighting via Highlight.js.
+         */
+        renderer.code = function (token) {
+          // Newer versions of marked pass an object {text, lang, escaped}
+          const code = (typeof token === "object" ? token.text : token) || "";
+          const lang = (
+            (typeof token === "object" ? token.lang : arguments[1]) || ""
+          ).toLowerCase();
+
+          const safeLanguage = hljs.getLanguage(lang) ? lang : "plaintext";
+          let highlighted;
+          try {
+            highlighted =
+              safeLanguage === "plaintext"
+                ? hljs.highlightAuto(code).value
+                : hljs.highlight(code, {
+                    language: safeLanguage,
+                    ignoreIllegals: true,
+                  }).value;
+          } catch (_) {
+            highlighted = code
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;");
+          }
+
+          const id = "codeblock-" + Math.random().toString(36).slice(2, 10);
+
+          return (
+            `<div class="code-wrap">` +
+            `<div class="code-bar">` +
+            `<span class="code-lang">${lang || "plaintext"}</span>` +
+            `<button class="copy-code-btn" data-target="${id}">` +
+            `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">` +
+            `<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>` +
+            `<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>` +
+            `</svg>` +
+            ` Copy code` +
+            `</button>` +
+            `</div>` +
+            `<pre id="${id}"><code class="hljs language-${safeLanguage}">${highlighted}</code></pre>` +
+            `</div>`
+          );
+        };
+
+        marked.use({ renderer });
+
+        /* ── Copy-code button handler (event delegation) ─────────── */
+        document.addEventListener("click", function (e) {
+          const btn = e.target.closest(".copy-code-btn");
+          if (!btn) return;
+
+          const targetId = btn.dataset.target;
+          const pre = document.getElementById(targetId);
+          if (!pre) return;
+
+          navigator.clipboard.writeText(pre.innerText).then(() => {
+            const orig = btn.innerHTML;
+            btn.classList.add("done");
+            btn.innerHTML =
+              `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">` +
+              `<polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+            setTimeout(() => {
+              btn.classList.remove("done");
+              btn.innerHTML = orig;
+            }, 2200);
+          });
+        });
+
+        /* ── DOM references ──────────────────────────────────────── */
+        const msgsEl         = document.getElementById("msgs");
+        const inputEl        = document.getElementById("userInput");
+        const sendBtn        = document.getElementById("sendBtn");
+        const welcome        = document.getElementById("welcome");
+        const typingRow      = document.getElementById("typingRow");
+        const histList       = document.getElementById("histList");
+        const sidebar        = document.getElementById("sidebar");
+        const overlay        = document.getElementById("overlay");
+        const menuBtn        = document.getElementById("menuBtn");
+        const closeSbBtn     = document.getElementById("closeSbBtn");
+        const newChatBtn     = document.getElementById("newChatBtn");
+
+        /* ── App state ───────────────────────────────────────────── */
+        let history   = []; // [{role, content}]
+        let sessions  = []; // saved chats for sidebar
+        let streaming = false;
+
+        /* ── Sidebar helpers ─────────────────────────────────────── */
+        const openSidebar = () => {
+          sidebar.classList.add("open");
+          overlay.classList.add("show");
+        };
+        const closeSidebar = () => {
+          sidebar.classList.remove("open");
+          overlay.classList.remove("show");
+        };
+
+        menuBtn.addEventListener("click", openSidebar);
+        closeSbBtn.addEventListener("click", closeSidebar);
+        overlay.addEventListener("click", closeSidebar);
+
+        /* ── Suggestion chips ────────────────────────────────────── */
+        document.querySelectorAll(".chip").forEach((chip) => {
+          chip.addEventListener("click", () => {
+            inputEl.value = chip.dataset.prompt || "";
+            resize();
+            updateSendBtn();
+            sendMessage();
+          });
+        });
+
+        /* ── New chat ────────────────────────────────────────────── */
+        newChatBtn.addEventListener("click", () => {
+          if (history.length) {
+            const title =
+              (history.find((m) => m.role === "user") || {}).content?.slice(
+                0,
+                46,
+              ) || "Chat";
+            sessions.unshift({ id: Date.now(), title });
+            renderSidebar();
+          }
+          history = [];
+          msgsEl.querySelectorAll(".msg-group").forEach((el) => el.remove());
+          welcome.style.display = "flex";
+          closeSidebar();
+          inputEl.focus();
+        });
+
+        function renderSidebar() {
+          histList.innerHTML = "";
+          sessions.slice(0, 30).forEach((s) => {
+            const div = document.createElement("div");
+            div.className = "hist-item";
+            div.title = s.title;
+
+            // chat bubble icon
+            const icon = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "svg",
+            );
+            icon.setAttribute("width", "13");
+            icon.setAttribute("height", "13");
+            icon.setAttribute("viewBox", "0 0 24 24");
+            icon.setAttribute("fill", "none");
+            icon.setAttribute("stroke", "currentColor");
+            icon.setAttribute("stroke-width", "2");
+            icon.setAttribute("stroke-linecap", "round");
+            icon.setAttribute("stroke-linejoin", "round");
+            const p = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "path",
+            );
+            p.setAttribute(
+              "d",
+              "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
+            );
+            icon.appendChild(p);
+
+            div.appendChild(icon);
+            div.appendChild(document.createTextNode(s.title));
+            histList.appendChild(div);
+          });
+        }
+
+        /* ── Input helpers ───────────────────────────────────────── */
+        function resize() {
+          inputEl.style.height = "auto";
+          inputEl.style.height = Math.min(inputEl.scrollHeight, 200) + "px";
+        }
+        function updateSendBtn() {
+          sendBtn.disabled = !inputEl.value.trim() || streaming;
+        }
+        inputEl.addEventListener("input", () => {
+          resize();
+          updateSendBtn();
+        });
+
+        /* ── Scroll ──────────────────────────────────────────────── */
+        function scrollBottom() {
+          msgsEl.scrollTop = msgsEl.scrollHeight;
+        }
+
+        /* ── Timestamp ───────────────────────────────────────────── */
+        function nowStr() {
+          return new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        }
+
+        /* ── Build a message group DOM node ─────────────────────── */
+        function buildGroup(role, text) {
+          const group = document.createElement("div");
+          group.className = `msg-group ${role}`;
+
+          // Meta row (avatar + sender + time)
+          const meta = document.createElement("div");
+          meta.className = "msg-meta";
+          const av = document.createElement("div");
+          av.className = "msg-av";
+          av.textContent = role === "user" ? "F" : "✦";
+          const sender = document.createElement("span");
+          sender.className = "msg-sender";
+          sender.textContent = role === "user" ? "You" : "AI Assistant";
+          const time = document.createElement("span");
+          time.className = "msg-time";
+          time.textContent = nowStr();
+          meta.append(av, sender, time);
+
+          // Body
+          const body = document.createElement("div");
+          body.className = "msg-body";
+
+          if (role === "user") {
+            body.textContent = text || "";
+          } else {
+            body.classList.add("rendered");
+            body.innerHTML = marked.parse(text || "");
+          }
+
+          // Action bar
+          const actions = document.createElement("div");
+          actions.className = "msg-actions";
+          const copyBtn = document.createElement("button");
+          copyBtn.className = "msg-act-btn";
+          copyBtn.innerHTML =
+            `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">` +
+            `<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>` +
+            `<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
+          copyBtn.addEventListener("click", () => {
+            navigator.clipboard.writeText(body.innerText).then(() => {
+              const orig = copyBtn.innerHTML;
+              copyBtn.textContent = "Copied!";
+              setTimeout(() => (copyBtn.innerHTML = orig), 1800);
+            });
+          });
+          actions.appendChild(copyBtn);
+
+          group.append(meta, body, actions);
+          return { group, body };
+        }
+
+        /* ── Append a completed user message ────────────────────── */
+        function appendUser(text) {
+          welcome.style.display = "none";
+          const { group } = buildGroup("user", text);
+          msgsEl.insertBefore(group, typingRow);
+          scrollBottom();
+        }
+
+        /* ── Helper: stream SSE response into a bot bubble ─────── */
+        async function streamResponse(fetchPromise, botBody, botGroup) {
+          let fullText = "";
+          const resp = await fetchPromise;
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+          const reader  = resp.body.getReader();
+          const decoder = new TextDecoder();
+          let buf = "";
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buf += decoder.decode(value, { stream: true });
+            const lines = buf.split("\n");
+            buf = lines.pop();
+
+            for (const line of lines) {
+              if (!line.startsWith("data: ")) continue;
+              const payload = line.slice(6).trim();
+              if (payload === "[DONE]") continue;
+              try {
+                const parsed = JSON.parse(payload);
+                if (parsed.error) throw new Error(parsed.error);
+                if (parsed.text) {
+                  fullText += parsed.text;
+                  typingRow.className = "typing-row";
+                  botGroup.style.display = "";
+                  botBody.innerHTML = marked.parse(fullText);
+                  scrollBottom();
+                }
+              } catch (_) {}
+            }
+          }
+          return fullText;
+        }
+
+        /* ── Send message ────────────────────────────────────────── */
+        async function sendMessage() {
+          const text = inputEl.value.trim();
+          if (!text || streaming) return;
+
+          inputEl.value = "";
+          resize();
+          updateSendBtn();
+
+          // Display the user message
+          appendUser(text);
+          history.push({ role: "user", content: text });
+
+          // Show typing dots
+          typingRow.className = "typing-row show";
+          scrollBottom();
+
+          streaming = true;
+          updateSendBtn();
+
+          // Build the bot bubble (hidden until first token arrives)
+          const { group: botGroup, body: botBody } = buildGroup("assistant", "");
+          botGroup.style.display = "none";
+          msgsEl.insertBefore(botGroup, typingRow);
+
+          let fullText = "";
+
+          try {
+            fullText = await streamResponse(
+              fetch("/api/chat", {
+                method:  "POST",
+                headers: { "Content-Type": "application/json" },
+                body:    JSON.stringify({ messages: history }),
+              }),
+              botBody, botGroup
+            );
+
+            if (fullText) history.push({ role: "assistant", content: fullText });
+          } catch (err) {
+            typingRow.className = "typing-row";
+            botGroup.style.display = "";
+            botBody.innerHTML = `<span style="color:#e74c3c">&#9888; ${err.message}</span>`;
+          } finally {
+            typingRow.className = "typing-row";
+            streaming = false;
+            updateSendBtn();
+            inputEl.focus();
+            scrollBottom();
+          }
+        }
+
+        /* ── Event listeners ─────────────────────────────────────── */
+        sendBtn.addEventListener("click", sendMessage);
+        inputEl.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+          }
+        });
+
+        inputEl.focus();
+      })();
+    </script>
+  </body>
+</html>
